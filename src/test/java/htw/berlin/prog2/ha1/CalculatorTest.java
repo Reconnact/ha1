@@ -88,7 +88,6 @@ class CalculatorTest {
         assertEquals(expected, actual);
     }
 
-
     @Test
     @DisplayName("should toggle sign of a positive number to negative")
     void testNegativeKey() {
@@ -98,6 +97,40 @@ class CalculatorTest {
         calc.pressNegativeKey();
 
         String expected = "-5";
+        String actual = calc.readScreen();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("should start fresh number input after pressing equals")
+    void testNewInputAfterEquals() {
+        Calculator calc = new Calculator();
+
+        calc.pressDigitKey(1);
+        calc.pressBinaryOperationKey("+");
+        calc.pressDigitKey(2);
+        calc.pressEqualsKey();
+        calc.pressDigitKey(5);
+
+        String expected = "5";
+        String actual = calc.readScreen();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("should apply last operation repeatedly when pressing equals multiple times")
+    void testRepeatedEquals() {
+        Calculator calc = new Calculator();
+
+        calc.pressDigitKey(2);
+        calc.pressBinaryOperationKey("+");
+        calc.pressDigitKey(3);
+        calc.pressEqualsKey();
+        calc.pressEqualsKey();
+
+        String expected = "8";
         String actual = calc.readScreen();
 
         assertEquals(expected, actual);
