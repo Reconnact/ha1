@@ -12,7 +12,11 @@ public class Calculator {
 
     private double latestValue;
 
+    private double latestOperand;
+
     private String latestOperation = "";
+
+    private boolean equalsJustPressed = false;
 
     /**
      * @return den aktuellen Bildschirminhalt als String
@@ -26,13 +30,16 @@ public class Calculator {
      * drücken kann muss der Wert positiv und einstellig sein und zwischen 0 und 9 liegen.
      * Führt in jedem Fall dazu, dass die gerade gedrückte Ziffer auf dem Bildschirm angezeigt
      * oder rechts an die zuvor gedrückte Ziffer angehängt angezeigt wird.
+     * Wurde zuvor die "="-Taste gedrückt, beginnt eine neue Zahleneingabe und der Bildschirm
+     * wird mit der gedrückten Ziffer überschrieben.
      * @param digit Die Ziffer, deren Taste gedrückt wurde
      */
     public void pressDigitKey(int digit) {
         if(digit > 9 || digit < 0) throw new IllegalArgumentException();
 
-        if(screen.equals("0") || latestValue == Double.parseDouble(screen)) screen = "";
+        if(screen.equals("0") || latestValue == Double.parseDouble(screen) || equalsJustPressed) screen = "";
 
+        equalsJustPressed = false;
         screen = screen + digit;
     }
 
@@ -118,16 +125,25 @@ public class Calculator {
      * und das Ergebnis direkt angezeigt.
      */
     public void pressEqualsKey() {
+        double currentValue = Double.parseDouble(screen);
+
+        if (equalsJustPressed) {
+            latestValue = currentValue;
+        } else {
+            latestOperand = currentValue;
+        }
+
         var result = switch(latestOperation) {
-            case "+" -> latestValue + Double.parseDouble(screen);
-            case "-" -> latestValue - Double.parseDouble(screen);
-            case "x" -> latestValue * Double.parseDouble(screen);
-            case "/" -> latestValue / Double.parseDouble(screen);
+            case "+" -> latestValue + latestOperand;
+            case "-" -> latestValue - latestOperand;
+            case "x" -> latestValue * latestOperand;
+            case "/" -> latestValue / latestOperand;
             default -> throw new IllegalArgumentException();
         };
         screen = Double.toString(result);
         if(screen.equals("Infinity")) screen = "Error";
         if(screen.endsWith(".0")) screen = screen.substring(0,screen.length()-2);
         if(screen.contains(".") && screen.length() > 11) screen = screen.substring(0, 10);
+        equalsJustPressed = true;
     }
 }
